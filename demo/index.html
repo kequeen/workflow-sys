@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Workflow 管理系统 Demo</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div class="brand">
+          <div class="logo">WF</div>
+          <div>
+            <div class="brand-title">Workflow 管理系统</div>
+            <div class="brand-subtitle">Prompt & Model Workflow</div>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <button class="ghost" id="btn-new">新建</button>
+          <button class="primary">运行工作流</button>
+        </div>
+      </header>
+
+      <div class="layout">
+        <aside class="sidebar">
+          <div class="workspace">
+            <div class="workspace-title">Workspace</div>
+            <div class="workspace-name">SemanticOps · Platform Demo</div>
+          </div>
+
+          <nav class="nav">
+            <button class="nav-item active" data-view="prompts">Prompt 版本</button>
+            <button class="nav-item" data-view="workflows">Workflow 画布</button>
+            <button class="nav-item" data-view="runs">运行记录</button>
+            <button class="nav-item" data-view="evals">评测对比</button>
+            <button class="nav-item" data-view="integrations">MCP/Skill</button>
+          </nav>
+
+          <div class="sidebar-footer">
+            <div class="status">
+              <span class="dot"></span>
+              Temporal: Connected
+            </div>
+            <div class="status">并发限制: 20</div>
+          </div>
+        </aside>
+
+        <main class="main">
+          <section class="summary" id="summary"></section>
+
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title" id="panel-title">Prompt 版本</div>
+                <div class="panel-subtitle" id="panel-subtitle">管理 prompt 迭代与对比</div>
+              </div>
+              <div class="panel-actions" id="panel-actions"></div>
+            </div>
+
+            <div class="panel-body">
+              <div class="list" id="list"></div>
+              <div class="detail" id="detail"></div>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <template id="prompt-detail-template">
+      <div class="detail-header">
+        <div>
+          <div class="detail-title"></div>
+          <div class="detail-subtitle"></div>
+        </div>
+        <div class="pill">Active</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-section-title">版本时间线</div>
+        <div class="timeline"></div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-section-title">版本内容</div>
+        <div class="code-block"></div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-section-title">版本对比</div>
+        <div class="compare">
+          <select class="compare-select" data-role="base"></select>
+          <select class="compare-select" data-role="candidate"></select>
+        </div>
+        <div class="diff-view"></div>
+      </div>
+    </template>
+
+    <template id="workflow-detail-template">
+      <div class="detail-header">
+        <div>
+          <div class="detail-title"></div>
+          <div class="detail-subtitle"></div>
+        </div>
+        <div class="pill">Temporal</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-section-title">DAG 预览</div>
+        <div class="dag-canvas"></div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-section-title">节点配置</div>
+        <div class="node-config"></div>
+      </div>
+    </template>
+
+    <template id="runs-detail-template">
+      <div class="detail-header">
+        <div>
+          <div class="detail-title"></div>
+          <div class="detail-subtitle"></div>
+        </div>
+        <div class="pill">Run</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-section-title">节点执行状态</div>
+        <div class="run-nodes"></div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-section-title">产出物</div>
+        <div class="artifacts"></div>
+      </div>
+    </template>
+
+    <template id="evals-detail-template">
+      <div class="detail-header">
+        <div>
+          <div class="detail-title"></div>
+          <div class="detail-subtitle"></div>
+        </div>
+        <div class="pill">Metrics</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-section-title">指标对比</div>
+        <div class="metrics"></div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-section-title">版本对比摘要</div>
+        <div class="compare-summary"></div>
+      </div>
+    </template>
+
+    <template id="integrations-detail-template">
+      <div class="detail-header">
+        <div>
+          <div class="detail-title"></div>
+          <div class="detail-subtitle"></div>
+        </div>
+        <div class="pill">Registry</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-section-title">已连接组件</div>
+        <div class="integrations"></div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-section-title">能力矩阵</div>
+        <div class="capabilities"></div>
+      </div>
+    </template>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
