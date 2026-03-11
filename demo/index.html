@@ -33,8 +33,7 @@
             <button class="nav-item active" data-view="prompts">Prompt 版本</button>
             <button class="nav-item" data-view="workflows">Workflow 画布</button>
             <button class="nav-item" data-view="runs">运行记录</button>
-            <button class="nav-item" data-view="evals">评测对比</button>
-            <button class="nav-item" data-view="integrations">MCP/Skill</button>
+            <button class="nav-item" data-view="integrations">能力集成</button>
           </nav>
 
           <div class="sidebar-footer">
@@ -129,24 +128,6 @@
       </div>
     </template>
 
-    <template id="evals-detail-template">
-      <div class="detail-header">
-        <div>
-          <div class="detail-title"></div>
-          <div class="detail-subtitle"></div>
-        </div>
-        <div class="pill">Metrics</div>
-      </div>
-      <div class="detail-section">
-        <div class="detail-section-title">指标对比</div>
-        <div class="metrics"></div>
-      </div>
-      <div class="detail-section">
-        <div class="detail-section-title">版本对比摘要</div>
-        <div class="compare-summary"></div>
-      </div>
-    </template>
-
     <template id="integrations-detail-template">
       <div class="detail-header">
         <div>
@@ -156,14 +137,166 @@
         <div class="pill">Registry</div>
       </div>
       <div class="detail-section">
-        <div class="detail-section-title">已连接组件</div>
-        <div class="integrations"></div>
+        <div class="integrations-tabs"></div>
+        <div class="component-list"></div>
       </div>
       <div class="detail-section">
         <div class="detail-section-title">能力矩阵</div>
         <div class="capabilities"></div>
       </div>
     </template>
+
+    <!-- Workflow 编辑器模板 -->
+    <template id="workflow-editor-template">
+      <div class="workflow-editor">
+        <div class="editor-toolbar">
+          <div class="editor-toolbar-left">
+            <button class="ghost" id="editor-back-btn">← 返回</button>
+            <input type="text" class="workflow-name-input" id="workflow-name-input" placeholder="Workflow 名称" value="新建 Workflow" />
+          </div>
+          <div class="editor-toolbar-right">
+            <button class="ghost" id="editor-model-btn">模型配置</button>
+            <button class="ghost" id="editor-clear-btn">清空画布</button>
+            <button class="primary" id="editor-save-btn">保存 Workflow</button>
+          </div>
+        </div>
+        <div class="editor-body">
+          <div class="editor-node-panel">
+            <div class="node-panel-title">节点类型</div>
+            <div class="node-palette" id="node-palette"></div>
+          </div>
+          <div class="editor-canvas-wrapper">
+            <div class="editor-canvas" id="editor-canvas">
+              <svg class="edges-svg" id="edges-svg"></svg>
+            </div>
+          </div>
+          <div class="editor-config-panel">
+            <div class="config-panel-tabs">
+              <button class="config-tab active" data-tab="node">节点配置</button>
+              <button class="config-tab" data-tab="model">模型配置</button>
+              <button class="config-tab" data-tab="description">描述</button>
+            </div>
+            <div class="config-panel-body" id="config-panel-body">
+              <div class="config-tab-content active" id="config-node-tab">
+                <div class="config-placeholder">点击节点进行配置</div>
+              </div>
+              <div class="config-tab-content" id="config-model-tab">
+                <div class="model-config-section">
+                  <div class="config-section-title">模型选择</div>
+                  <div class="form-group">
+                    <label>模型</label>
+                    <select class="config-select" id="model-select"></select>
+                  </div>
+                </div>
+                <div class="model-config-section">
+                  <div class="config-section-title">参数配置</div>
+                  <div class="form-group">
+                    <label>Temperature</label>
+                    <div class="slider-group">
+                      <input type="range" class="config-slider" id="model-temperature" min="0" max="2" step="0.1" value="0.3" />
+                      <span class="slider-value" id="temperature-value">0.3</span>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>Max Tokens</label>
+                    <input type="number" class="config-input" id="model-max-tokens" min="1" max="128000" value="4096" />
+                  </div>
+                  <div class="form-group">
+                    <label>Top P</label>
+                    <div class="slider-group">
+                      <input type="range" class="config-slider" id="model-top-p" min="0" max="1" step="0.05" value="1" />
+                      <span class="slider-value" id="top-p-value">1.0</span>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>Frequency Penalty</label>
+                    <div class="slider-group">
+                      <input type="range" class="config-slider" id="model-freq-penalty" min="0" max="2" step="0.1" value="0" />
+                      <span class="slider-value" id="freq-penalty-value">0</span>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>Presence Penalty</label>
+                    <div class="slider-group">
+                      <input type="range" class="config-slider" id="model-pres-penalty" min="0" max="2" step="0.1" value="0" />
+                      <span class="slider-value" id="pres-penalty-value">0</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="model-config-section">
+                  <div class="config-section-title">模型信息</div>
+                  <div class="model-info" id="model-info">
+                    <div class="model-info-row"><span>提供商:</span><span id="model-provider">-</span></div>
+                    <div class="model-info-row"><span>最大上下文:</span><span id="model-max-context">-</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="config-tab-content" id="config-description-tab">
+                <div class="description-section">
+                  <div class="config-section-title">Workflow 描述</div>
+                  <div class="description-actions">
+                    <button class="ghost" id="generate-desc-btn">生成描述</button>
+                    <button class="ghost" id="sync-from-desc-btn">从描述同步</button>
+                  </div>
+                  <textarea class="config-textarea description-textarea" id="workflow-description" placeholder="点击'生成描述'自动生成，或手动编辑后点击'从描述同步'更新节点..."></textarea>
+                </div>
+                <div class="description-section">
+                  <div class="config-section-title">LLM 执行</div>
+                  <div class="form-group">
+                    <label>执行状态</label>
+                    <div class="execution-status" id="execution-status">等待执行</div>
+                  </div>
+                  <div class="description-actions">
+                    <button class="primary" id="execute-workflow-btn">执行 Workflow</button>
+                  </div>
+                  <div class="execution-output" id="execution-output">
+                    <div class="config-section-title">执行输出</div>
+                    <div class="output-content" id="output-content">-</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <!-- 导入弹窗 -->
+    <div class="modal-overlay" id="import-modal" style="display: none;">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title">导入远端组件</div>
+          <button class="modal-close" id="modal-close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>组件类型</label>
+            <select id="import-type">
+              <option value="mcp">MCP</option>
+              <option value="skill">Skill</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>远端地址</label>
+            <input type="text" id="import-url" placeholder="https://registry.example.com/component" />
+          </div>
+          <div class="form-group">
+            <label>或从注册中心选择</label>
+            <select id="import-registry">
+              <option value="">-- 选择已连接的注册中心 --</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>组件名称（可选）</label>
+            <input type="text" id="import-name" placeholder="自动获取或手动输入" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="ghost" id="import-cancel-btn">取消</button>
+          <button class="primary" id="import-confirm-btn">导入</button>
+        </div>
+      </div>
+    </div>
 
     <script src="data.js"></script>
     <script src="app.js"></script>

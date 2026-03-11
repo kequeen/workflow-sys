@@ -1,9 +1,40 @@
 const demoData = {
+  // 节点类型配置
+  nodeTypes: [
+    { type: "dataset", name: "数据节点", color: "#3b82f6", icon: "📊" },
+    { type: "prompt", name: "Prompt 节点", color: "#8b5cf6", icon: "💬" },
+    { type: "skill", name: "Skill 节点", color: "#10b981", icon: "⚡" },
+    { type: "mcp", name: "MCP 节点", color: "#f59e0b", icon: "🔗" },
+    { type: "output", name: "结果输出", color: "#ef4444", icon: "📤" },
+  ],
+
+  // 可用模型列表
+  availableModels: [
+    { id: "gpt-4.1", name: "GPT-4.1", provider: "OpenAI", maxTokens: 128000 },
+    { id: "gpt-4.1-mini", name: "GPT-4.1 Mini", provider: "OpenAI", maxTokens: 128000 },
+    { id: "gpt-4o", name: "GPT-4o", provider: "OpenAI", maxTokens: 128000 },
+    { id: "claude-3.5-sonnet", name: "Claude 3.5 Sonnet", provider: "Anthropic", maxTokens: 200000 },
+    { id: "claude-3-opus", name: "Claude 3 Opus", provider: "Anthropic", maxTokens: 200000 },
+    { id: "claude-3-haiku", name: "Claude 3 Haiku", provider: "Anthropic", maxTokens: 200000 },
+    { id: "deepseek-v3", name: "DeepSeek V3", provider: "DeepSeek", maxTokens: 64000 },
+    { id: "qwen-max", name: "Qwen Max", provider: "Alibaba", maxTokens: 32000 },
+    { id: "doubao-pro", name: "Doubao Pro", provider: "ByteDance", maxTokens: 128000 },
+  ],
+
+  // 默认模型配置
+  defaultModelConfig: {
+    model: "gpt-4.1",
+    temperature: 0.3,
+    maxTokens: 4096,
+    topP: 1.0,
+    frequencyPenalty: 0,
+    presencePenalty: 0,
+  },
+
   summary: [
     { title: "Prompts", value: "12" },
     { title: "Workflow 版本", value: "6" },
     { title: "运行中", value: "2" },
-    { title: "评测任务", value: "5" },
   ],
   prompts: [
     {
@@ -128,61 +159,31 @@ const demoData = {
       ],
     },
   ],
-  evals: [
-    {
-      id: "e-101",
-      name: "聚类标签质量评测",
-      type: "cluster",
-      dataset: "cluster-raw-202603",
-      baseline: "v2",
-      candidate: "v3",
-      metrics: [
-        { name: "一致性", value: 0.82 },
-        { name: "覆盖率", value: 0.91 },
-        { name: "可解释性", value: 0.87 },
-      ],
-      summary:
-        "v3 在覆盖率与可解释性上提升明显，建议作为默认版本并保留 v2 作为回退。",
-    },
-    {
-      id: "e-102",
-      name: "搜索相关性打标评测",
-      type: "relevance",
-      dataset: "search-pairs-202603",
-      baseline: "v1",
-      candidate: "v2",
-      metrics: [
-        { name: "准确率", value: 0.89 },
-        { name: "召回率", value: 0.83 },
-        { name: "F1", value: 0.86 },
-      ],
-      summary:
-        "v2 在部分相关的识别上更稳健，整体 F1 提升 4%。",
-    },
+  // 远端注册中心
+  remoteRegistries: [
+    { id: "reg-01", name: "Official MCP Registry", url: "https://registry.mcp.dev", status: "connected" },
+    { id: "reg-02", name: "Internal Skill Hub", url: "https://skills.internal.io", status: "connected" },
+    { id: "reg-03", name: "Community Registry", url: "https://community.mcp.dev", status: "available" },
   ],
-  integrations: [
-    {
-      id: "i-01",
-      name: "聚类后处理 Skill",
-      type: "Skill",
-      status: "connected",
-      provider: "internal",
-    },
-    {
-      id: "i-02",
-      name: "向量检索 MCP",
-      type: "MCP",
-      status: "connected",
-      provider: "open-source",
-    },
-    {
-      id: "i-03",
-      name: "人审标注平台",
-      type: "Connector",
-      status: "pending",
-      provider: "third-party",
-    },
+
+  // MCP 组件列表
+  mcpIntegrations: [
+    { id: "mcp-01", name: "向量检索 MCP", status: "connected", version: "1.2.0", registry: "Official MCP Registry", description: "提供向量相似度检索能力" },
+    { id: "mcp-02", name: "文件系统 MCP", status: "available", version: "2.0.1", registry: "Official MCP Registry", description: "文件读写与目录管理" },
+    { id: "mcp-03", name: "数据库查询 MCP", status: "available", version: "1.0.0", registry: "Community Registry", description: "SQL 数据库查询接口" },
+    { id: "mcp-04", name: "Web 搜索 MCP", status: "connected", version: "1.5.0", registry: "Official MCP Registry", description: "联网搜索与信息检索" },
   ],
+
+  // Skill 组件列表
+  skillIntegrations: [
+    { id: "skill-01", name: "聚类后处理 Skill", status: "connected", version: "1.0.0", registry: "Internal Skill Hub", description: "聚类结果的清洗与格式化" },
+    { id: "skill-02", name: "文本清洗 Skill", status: "available", version: "2.1.0", registry: "Internal Skill Hub", description: "文本预处理与标准化" },
+    { id: "skill-03", name: "数据格式转换 Skill", status: "available", version: "1.5.0", registry: "Internal Skill Hub", description: "JSON/CSV/Parquet 格式互转" },
+    { id: "skill-04", name: "Prompt 增强 Skill", status: "connected", version: "1.2.0", registry: "Internal Skill Hub", description: "自动优化 Prompt 结构" },
+  ],
+
+  // 保留兼容旧数据（已清空）
+  integrations: [],
   capabilities: [
     { name: "Prompt 版本对比", status: "已启用" },
     { name: "Temporal 长流程", status: "已启用" },
